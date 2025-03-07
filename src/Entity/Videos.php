@@ -22,6 +22,9 @@ class Videos
     #[ORM\Column]
     private ?int $ordre = null;
 
+    #[ORM\ManyToOne(inversedBy: 'videos')]
+    private ?cours $cours_id = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class Videos
     public function setOrdre(int $ordre): static
     {
         $this->ordre = $ordre;
+
+        return $this;
+    }
+
+    public function getCoursId(): ?cours
+    {
+        return $this->cours_id;
+    }
+
+    public function setCoursId(?cours $cours_id): static
+    {
+        $this->cours_id = $cours_id;
 
         return $this;
     }
