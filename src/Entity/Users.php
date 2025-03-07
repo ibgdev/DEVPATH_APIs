@@ -28,6 +28,9 @@ class Users
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
+    #[ORM\ManyToOne(inversedBy: 'user_id')]
+    private ?Progression $progression = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +92,18 @@ class Users
     public function setCreatedAt(\DateTimeImmutable $created_at): static
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getProgression(): ?Progression
+    {
+        return $this->progression;
+    }
+
+    public function setProgression(?Progression $progression): static
+    {
+        $this->progression = $progression;
 
         return $this;
     }

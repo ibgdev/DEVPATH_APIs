@@ -22,6 +22,16 @@ class Progression
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?users $user_id = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?cours $cours_id = null;
+
+    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,4 +72,29 @@ class Progression
 
         return $this;
     }
+
+    public function getUserId(): ?users
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(?users $user_id): static
+    {
+        $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getCoursId(): ?cours
+    {
+        return $this->cours_id;
+    }
+
+    public function setCoursId(?cours $cours_id): static
+    {
+        $this->cours_id = $cours_id;
+
+        return $this;
+    }
+
 }
