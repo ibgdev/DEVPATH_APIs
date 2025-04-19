@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello CoursController!{% endblock %}
+
+{% block body %}
+
+<div class="example-wrapper">
+    <h3>All Courses</h3>
+    {% for msg in app.flashes('success') %}
+        <div class="alert alert-success">{{ msg }}</div>
+    {% endfor %}
+    <h5 class="d-inline">Add a new course : </h5> <a href="{{ path('crud.course.add') }}" class="btn btn-success">New course</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+                <tr>
+                    <td>{{ course.id }}</td>
+                    <td>{{ course.titre }}</td>
+                    <td>{{ course.description }}</td>
+                    <td>{{ course.createdAt|date('Y-m-d H:i:s') }}</td>
+                    <td>
+                        <a href="{{ path('crud.course.edit', {id : course.id}) }}" class="btn btn-primary text-light">Edit</a>
+                        <a href="{{ path('crud.course.videos', {id : course.id}) }}" class="btn btn-warning text-light">Videos</a>
+                        <form action="{{ path('crud.course.delete', {id : course.id})}}" method="post" style="display:inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ course.id) }}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">No courses found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% for course in courses %}
+        
+    {% endfor %}
+</div>
+{% endblock %}

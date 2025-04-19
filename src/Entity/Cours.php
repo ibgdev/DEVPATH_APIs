@@ -42,6 +42,9 @@ class Cours
     #[ORM\OneToMany(targetEntity: RoadmapCours::class, mappedBy: 'cours')]
     private Collection $roadmapCours;
 
+    #[ORM\Column(length: 255)]
+    private ?string $image_url = null;
+
     public function __construct()
     {
         $this->videos = new ArrayCollection();
@@ -176,6 +179,18 @@ class Cours
                 $roadmapCour->setCours(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getImageUrl(): ?string
+    {
+        return $this->image_url;
+    }
+
+    public function setImageUrl(string $image_url): static
+    {
+        $this->image_url = $image_url;
 
         return $this;
     }
