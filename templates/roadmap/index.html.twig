@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Roadmaps List{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h3>All Roadmaps</h3>
+
+    {% for msg in app.flashes('success') %}
+        <div class="alert alert-success">{{ msg }}</div>
+    {% endfor %}
+
+    <div class="d-flex justify-content-between align-items-center my-3">
+        <h5 class="mb-0">Add a new roadmap:</h5>
+        <a href="{{ path('crud.roadmaps.add') }}" class="btn btn-success">New Roadmap</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for roadmap in roadmaps %}
+                <tr>
+                    <td>{{ roadmap.id }}</td>
+                    <td>{{ roadmap.titre }}</td>
+                    <td>{{ roadmap.description|slice(0, 100) ~ (roadmap.description|length > 100 ? '...' : '') }}</td>
+                    <td class="d-flex gap-1">
+                        <a href="{{ path('crud.roadmaps.edit', {id : roadmap.id}) }}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="" class="btn btn-warning btn-sm text-light">Courses</a>
+                        <form action="{{ path('crud.roadmaps.delete', {id : roadmap.id}) }}" method="post" onsubmit="return confirm('Are you sure?')" style="display:inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ roadmap.id) }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">No roadmaps found</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

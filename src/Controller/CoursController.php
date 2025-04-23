@@ -14,25 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CoursController extends AbstractController
 {
-
-    #[Route('/api/courses', name: 'api.courses')]
-    public function api_get_courses(EntityManagerInterface $em): Response
-    {
-        $courses = $em->getRepository(Cours::class)->findAll();
-        if (empty($courses)) {
-            return $this->json(['message' => 'No courses found']);
-        }
-        $data = array_map(function ($course) {
-            return [
-                'id' => $course->getId(),
-                'titre' => $course->getTitre(),
-                'description' => $course->getDescription(),
-                'image_url' => $course->getImageUrl(),
-                'created_at' => $course->getCreatedAt()->format('Y-m-d'),
-            ];
-        }, $courses);
-        return $this->json($data);
-    }
+    // Crud pages
 
     #[Route('/courses', name: 'crud.course.all')]
     public function index(EntityManagerInterface $em): Response
@@ -85,29 +67,6 @@ final class CoursController extends AbstractController
         return $this->redirectToRoute('crud.course.all');
     }
 
-    #[Route('/api/courses/{id}/videos', name: 'api.course.videos', methods: ['GET'])]
-    public function api_get_videos(int $id, Cours $course): Response
-    {
-
-        if (!$course) {
-            return $this->json(['message' => 'Course not found'], 404);
-        }
-
-        $videos = $course->getVideos(); 
-
-        $data = [];
-
-        foreach ($videos as $video) {
-            $data[] = [
-                'id' => $video->getId(),
-                'titre' => $video->getTitre(),
-                'url' => $video->getUrl(),
-                'ord' => $video->getOrd(),
-            ];
-        }
-
-        return $this->json($data);
-    }
 
     #[Route('/course/{id}/videos', name: 'crud.course.videos')]
     public function videos(EntityManagerInterface $em, Cours $course): Response
@@ -135,5 +94,66 @@ final class CoursController extends AbstractController
             'form' => $form,
             'course' => $course,
         ]);
+    }
+
+    // Api Pages
+
+    #[Route('/api/courses', name: 'api.courses')]
+    public function api_get_courses(EntityManagerInterface $em): Response
+    {
+        $courses = $em->getRepository(Cours::class)->findAll();
+        if (empty($courses)) {
+            return $this->json(['message' => 'No courses found']);
+        }
+        $data = array_map(function ($course) {
+            return [
+                'id' => $course->getId(),
+                'titre' => $course->getTitre(),
+                'description' => $course->getDescription(),
+                'image_url' => $course->getImageUrl(),
+                'created_at' => $course->getCreatedAt()->format('Y-m-d'),
+            ];
+        }, $courses);
+        return $this->json($data);
+    }
+    #[Route('/api/courses/{id}', name: 'api.course.id')]
+    public function api_get_course_id(EntityManagerInterface $em, int $id): Response
+    {
+        $course = $em->getRepository(Cours::class)->find($id);
+        if (!$course) {
+            return $this->json(['message' => 'No courses found']);
+        }
+        $data = [
+            'id' => $course->getId(),
+            'titre' => $course->getTitre(),
+            'description' => $course->getDescription(),
+            'image_url' => $course->getImageUrl(),
+            'created_at' => $course->getCreatedAt()->format('Y-m-d'),
+        ];
+        return $this->json($data);
+    }
+
+    #[Route('/api/courses/{id}/videos', name: 'api.course.videos', methods: ['GET'])]
+    public function api_get_videos(int $id, Cours $course): Response
+    {
+
+        if (!$course) {
+            return $this->json(['message' => 'Course not found'], 404);
+        }
+
+        $videos = $course->getVideos(); 
+
+        $data = [];
+
+        foreach ($videos as $video) {
+            $data[] = [
+                'id' => $video->getId(),
+                'titre' => $video->getTitre(),
+                'url' => $video->getUrl(),
+                'ord' => $video->getOrd(),
+            ];
+        }
+
+        return $this->json($data);
     }
 }
