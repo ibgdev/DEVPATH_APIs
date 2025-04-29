@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Cours;
+use App\Entity\RoadmapCours;
 use App\Entity\Roadmaps;
+use App\Form\RoadmapCourseType;
 use App\Form\RoadmapsType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -67,6 +70,33 @@ final class RoadmapsController extends AbstractController
         return $this->redirectToRoute('crud.roadmaps.all');
     }
 
+    #[Route('/roadmap/{id}/courses', name: 'crud.roadmap.courses')]
+    public function courses(EntityManagerInterface $em, Roadmaps $roadmap): Response
+    {
+        $courses = $roadmap->getRoadmapCours();
+        return $this->render('roadmap/courses.html.twig', [
+            'courses' => $courses,
+            'roadmap' => $roadmap,
+        ]);
+    }
+    #[Route('/roadmap/{id}/courses/add', name: 'crud.roadmap.courses.add')]
+    public function courses_add(EntityManagerInterface $em, Request $request, Roadmaps $roadmap): Response
+    {
+        $Rcourse = new RoadmapCours();
+        $form = $this->createForm(RoadmapCourseType::class, $Rcourse);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $Rcourse->setRoadmap($roadmap);
+            $em->persist($Rcourse);
+            $em->flush();
+            $this->addFlash('success', 'Course added successfully');
+        }
+        return $this->render('roadmap/course_add.html.twig', [
+            'form' => $form,
+            'rcourse' => $Rcourse,
+        ]);
+    }
+
     //api pages
     #[Route('/api/roadmaps', name: 'api.roadmaps.all')]
     public function api_get_roadmaps(EntityManagerInterface $em): Response
@@ -79,8 +109,11 @@ final class RoadmapsController extends AbstractController
             return [
                 'id' => $roadmap->getId(),
                 'titre' => $roadmap->getTitre(),
-                'description' => $roadmap->getDescription(),            ];
+                'description' => $roadmap->getDescription(),            
+            ];
         }, $roadmaps);
         return $this->json($data);
     }
+
+    //TODO : add crud for roadmaps courses  
 }

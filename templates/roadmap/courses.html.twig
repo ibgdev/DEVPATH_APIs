@@ -1,20 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CoursController!{% endblock %}
-
 {% block body %}
     <div class="layout-container">
         {% include 'sidebar.html.twig' %}
         
-        <div class="main-content mt-4">
-            <h3>All Courses</h3>
+        <div class="main-content">
+            <h3>Videos list for {{ roadmap.titre }}</h3>
             
             {% for msg in app.flashes('success') %}
                 <div class="alert alert-success">{{ msg }}</div>
             {% endfor %}
             
             <h5 class="d-inline">Add a new course : </h5> 
-            <a href="{{ path('crud.course.add') }}" class="btn btn-success">New course</a>
+            <a href="{{ path('crud.roadmap.courses.add', {id: roadmap.id}) }}" class="btn btn-success">New Course</a>
 
             <table class="table table-striped">
                 <thead>
@@ -22,21 +20,20 @@
                         <th>Id</th>
                         <th>Title</th>
                         <th>Description</th>
-                        <th>Created At</th>
+                        <th>Order</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for course in courses %}
                         <tr>
-                            <td>{{ course.id }}</td>
-                            <td>{{ course.titre }}</td>
-                            <td>{{ course.description }}</td>
-                            <td>{{ course.createdAt|date('Y-m-d H:i:s') }}</td>
+                            <td>{{ course.cours.id }}</td>
+                            <td>{{ course.cours.titre }}</td>
+                            <td>{{ course.cours.description }}</td>
+                            <td>{{ course.ord }}</td>
                             <td>
-                                <a href="{{ path('crud.course.edit', {id : course.id}) }}" class="btn btn-primary text-light">Edit</a>
-                                <a href="{{ path('crud.course.videos', {id : course.id}) }}" class="btn btn-warning text-light">Videos</a>
-                                <form action="{{ path('crud.course.delete', {id : course.id})}}" method="post" style="display:inline;">
+                                <a href="{{ path('crud.course.edit', {id: course.cours.id}) }}" class="btn btn-primary text-light">Edit</a>
+                                <form action="{{ path('crud.course.delete', {id: course.cours.id}) }}" method="post" style="display:inline;">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ course.id) }}">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
@@ -55,7 +52,7 @@
     <style>
         .layout-container {
             display: flex;
-            margin-left: 250px; /* Adjust this width to match your sidebar's width */
+            margin-left: 250px; /* Adjust this width based on your sidebar's width */
         }
 
         .main-content {

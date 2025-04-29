@@ -1,6 +1,30 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Add a new Course</h1>
-    {{ form(form) }}
+    <div class="layout-container">
+        {% include 'sidebar.html.twig' %}
+        
+        <div class="main-content">
+            <h1>Add a new Course</h1>
+            {{ form(form) }}
+        </div>
+    </div>
+
+    <style>
+        .layout-container {
+            display: flex;
+            margin-left: 250px; /* Adjust this width based on the sidebar size */
+        }
+
+        .main-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .layout-container {
+                margin-left: 0; /* Removes the margin for small screens */
+            }
+        }
+    </style>
 {% endblock %}

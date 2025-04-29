@@ -1,40 +1,73 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h3>Videos list for {{ course.titre }}</h3>
-    {% for msg in app.flashes('success') %}
-        <div class="alert alert-success">{{ msg }}</div>
-    {% endfor %}
-    <h5 class="d-inline">Add a new video : </h5> <a href="{{ path('crud.video.add', {id : course.id}) }}" class="btn btn-success">New video</a>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Created At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for video in videos %}
-                <tr>
-                    <td>{{ video.id }}</td>
-                    <td>{{ video.titre }}</td>
-                    <td>{{ video.url }}</td>
-                    <td>{{ video.ord }}</td>
-                    <td>
-                        <a href="" class="btn btn-primary text-light">Edit</a>
-                        <form action="" method="post" style="display:inline;">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ video.id) }}">
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="4">No videos found</td>
-                </tr>
+    <div class="layout-container">
+        {% include 'sidebar.html.twig' %}
+        
+        <div class="main-content">
+            <h3>Videos list for {{ course.titre }}</h3>
+
+            {% for msg in app.flashes('success') %}
+                <div class="alert alert-success">{{ msg }}</div>
             {% endfor %}
-        </tbody>
+            
+            <h5 class="d-inline">Add a new video : </h5> 
+            <a href="{{ path('crud.video.add', {id : course.id}) }}" class="btn btn-success">New video</a>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Order</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for video in videos %}
+                        <tr>
+                            <td>{{ video.id }}</td>
+                            <td>{{ video.titre }}</td>
+                            <td>{{ video.url }}</td>
+                            <td>{{ video.ord }}</td>
+                            <td>
+                                <a href="" class="btn btn-primary text-light">Edit</a>
+                                <form action="" method="post" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ video.id) }}">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5">No videos found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <style>
+        .layout-container {
+            display: flex;
+            margin-left: 250px; /* Adjust this width based on your sidebar width */
+        }
+
+        .main-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .layout-container {
+                margin-left: 0; /* Removes the margin for small screens */
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+        }
+    </style>
 {% endblock %}

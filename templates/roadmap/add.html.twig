@@ -1,6 +1,34 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Add a new roadmap</h1>
-    {{ form(form) }}
+    <div class="layout-container">
+        {% include 'sidebar.html.twig' %}
+        
+        <div class="main-content">
+            <h1>Add a new roadmap</h1>
+            {{ form(form) }}
+        </div>
+    </div>
+
+    <style>
+        .layout-container {
+            display: flex;
+            margin-left: 250px; /* Adjust this width based on your sidebar's width */
+        }
+
+        .main-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 768px) {
+            .layout-container {
+                margin-left: 0; /* Removes the margin for small screens */
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+        }
+    </style>
 {% endblock %}
