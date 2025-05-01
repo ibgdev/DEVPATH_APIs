@@ -5,7 +5,7 @@
         {% include 'sidebar.html.twig' %}
         
         <div class="main-content">
-            <h3>Videos list for {{ roadmap.titre }}</h3>
+            <h3>Courses list for {{ roadmap.titre | upper }} roadmap</h3>
             
             {% for msg in app.flashes('success') %}
                 <div class="alert alert-success">{{ msg }}</div>

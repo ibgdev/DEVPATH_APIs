@@ -30,7 +30,14 @@ class CoursRepository extends ServiceEntityRepository
     //            ->getResult()
     //        ;
     //    }
-
+        public function findAllRecent() : array
+        {
+            return $this->createQueryBuilder('c')
+                ->orderBy('c.created_at', 'DESC')
+                ->setMaxResults(3)
+                ->getQuery()
+                ->getResult();
+        }
     //    public function findOneBySomeField($value): ?Cours
     //    {
     //        return $this->createQueryBuilder('c')

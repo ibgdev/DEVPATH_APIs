@@ -98,6 +98,25 @@ final class CoursController extends AbstractController
 
     // Api Pages
 
+    #[Route('/api/courses/recent', name: 'api.courses.recent')]
+    public function api_get_courses_recent(EntityManagerInterface $em): Response
+    {
+        $courses = $em->getRepository(Cours::class)->findAllRecent();
+        if (empty($courses)) {
+            return $this->json(['message' => 'No courses found']);
+        }
+        $data = array_map(function ($course) {
+            return [
+                'id' => $course->getId(),
+                'titre' => $course->getTitre(),
+                'description' => $course->getDescription(),
+                'image_url' => $course->getImageUrl(),
+                'created_at' => $course->getCreatedAt()->format('Y-m-d'),
+            ];
+        }, $courses);
+        return $this->json($data);
+    }
+    
     #[Route('/api/courses', name: 'api.courses')]
     public function api_get_courses(EntityManagerInterface $em): Response
     {
