@@ -8,7 +8,9 @@ use App\Entity\Roadmaps;
 use App\Form\RoadmapCourseType;
 use App\Form\RoadmapsType;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -115,5 +117,61 @@ final class RoadmapsController extends AbstractController
         return $this->json($data);
     }
 
-    //TODO : add crud for roadmaps courses  
+    #[Route('/api/roadmaps/{id}/courses', name: 'api.roadmap.courses')]
+    public function api_courses(EntityManagerInterface $em, Roadmaps $roadmap): JsonResponse
+    {
+        $courses = $roadmap->getRoadmapCours(); // Assuming this returns a collection of RoadmapCourse
+    
+        if (empty($courses)) {
+            return $this->json(['message' => 'No courses found']);
+        }
+    
+        $data = array_map(function ($roadmapCourse) {
+            $course = $roadmapCourse->getCours(); // Accessing the associated Course entity
+    
+            return [
+                'id' => $course->getId(), // Ensure this is the correct course ID
+                'titre' => $course->getTitre(),
+                'description' => $course->getDescription(),
+                'image' => $course->getImageUrl(),
+            ];
+        }, $courses->toArray());
+    
+        return $this->json($data);
+    }
+    #[Route('/api/roadmaps/{id}/courses', name: 'api.roadmap.courses')]
+    public function api_course(EntityManagerInterface $em, Roadmaps $roadmap): JsonResponse
+    {
+        $courses = $roadmap->getRoadmapCours(); // Assuming this returns a collection of RoadmapCourse
+    
+        if (empty($courses)) {
+            return $this->json(['message' => 'No courses found']);
+        }
+    
+        $data = array_map(function ($roadmapCourse) {
+            $course = $roadmapCourse->getCours(); // Accessing the associated Course entity
+    
+            return [
+                'id' => $course->getId(), // Ensure this is the correct course ID
+                'titre' => $course->getTitre(),
+                'description' => $course->getDescription(),
+                'image' => $course->getImageUrl(),
+            ];
+        }, $courses->toArray());
+    
+        return $this->json($data);
+    }
+        
+    #[Route('/api/roadmaps/{id}', name: 'api.roadmap.infos')]
+    public function api_infos(EntityManagerInterface $em, Roadmaps $roadmap): JsonResponse
+    {
+        if (empty($roadmap)) {
+            return $this->json(['message' => 'No roadmap found']);
+        }
+        $data = [
+            'titre' => $roadmap->getTitre(),
+            'description' => $roadmap->getDescription(),
+        ];
+        return $this->json($data);
+    }
 }
