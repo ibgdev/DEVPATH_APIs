@@ -1,76 +1,315 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CoursController!{% endblock %}
+{% block title %}Course Management{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --sidebar-bg: #1a2c56;
+            --sidebar-hover: #2d4482;
+            --sidebar-active: #3B82F6;
+            --sidebar-text: #ffffff;
+            --sidebar-icon: #a3bffa;
+            --content-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --primary-btn: #3B82F6;
+            --primary-btn-hover: #2563eb;
+            --success-btn: #10b981;
+            --success-btn-hover: #059669;
+            --danger-btn: #ef4444;
+            --danger-btn-hover: #dc2626;
+            --warning-btn: #f59e0b;
+            --warning-btn-hover: #d97706;
+            --header-text: #1e293b;
+            --body-text: #4b5563;
+        }
+
+        body {
+            background-color: var(--content-bg);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            margin-left: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .page-title {
+            color: var(--header-text);
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert {
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success-btn);
+            color: #065f46;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            color: var(--header-text);
+        }
+
+        .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            color: var(--body-text);
+            vertical-align: middle;
+        }
+
+        .table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-btn);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-btn-hover);
+        }
+
+        .btn-success {
+            background-color: var(--success-btn);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-btn-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-btn);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-btn-hover);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-btn);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: var(--warning-btn-hover);
+        }
+
+        .btn-icon {
+            margin-right: 0.5rem;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--body-text);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .actions-cell {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
     <div class="layout-container">
         {% include 'sidebar.html.twig' %}
         
-        <div class="main-content mt-4">
-            <h3>All Courses</h3>
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Course Management</h1>
+                <a href="{{ path('crud.course.add') }}" class="btn btn-success">
+                    <i class="fas fa-plus btn-icon"></i> New Course
+                </a>
+            </div>
             
             {% for msg in app.flashes('success') %}
-                <div class="alert alert-success">{{ msg }}</div>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> {{ msg }}
+                </div>
             {% endfor %}
             
-            <h5 class="d-inline">Add a new course : </h5> 
-            <a href="{{ path('crud.course.add') }}" class="btn btn-success">New course</a>
-
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for course in courses %}
+            <div class="content-card">
+                <div class="action-bar">
+                    <h2 class="section-title">All Courses</h2>
+                </div>
+                
+                <table class="table">
+                    <thead>
                         <tr>
-                            <td>{{ course.id }}</td>
-                            <td>{{ course.titre }}</td>
-                            <td>{{ course.description }}</td>
-                            <td>{{ course.createdAt|date('Y-m-d H:i:s') }}</td>
-                            <td>
-                                <a href="{{ path('crud.course.edit', {id : course.id}) }}" class="btn btn-primary text-light">Edit</a>
-                                <a href="{{ path('crud.course.videos', {id : course.id}) }}" class="btn btn-warning text-light">Videos</a>
-                                <form action="{{ path('crud.course.delete', {id : course.id})}}" method="post" style="display:inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ course.id) }}">
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                            </td>
+                            <th width="5%">ID</th>
+                            <th width="20%">Title</th>
+                            <th width="40%">Description</th>
+                            <th width="15%">Created At</th>
+                            <th width="20%">Actions</th>
                         </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="5">No courses found</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                            <tr>
+                                <td>{{ course.id }}</td>
+                                <td>
+                                    <strong>{{ course.titre }}</strong>
+                                </td>
+                                <td>
+                                    <div class="description-text">{{ course.description|length > 100 ? course.description|slice(0, 100) ~ '...' : course.description }}</div>
+                                </td>
+                                <td>{{ course.createdAt|date('M d, Y') }}</td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <a href="{{ path('crud.course.edit', {id : course.id}) }}" class="btn btn-primary">
+                                            <i class="fas fa-edit btn-icon"></i> Edit
+                                        </a>
+                                        <a href="{{ path('crud.course.videos', {id : course.id}) }}" class="btn btn-warning">
+                                            <i class="fas fa-video btn-icon"></i> Videos
+                                        </a>
+                                        <form action="{{ path('crud.course.delete', {id : course.id})}}" method="post" onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ course.id) }}">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-trash btn-icon"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <i class="fas fa-book-open fa-3x mb-3"></i>
+                                        <h3>No courses found</h3>
+                                        <p>Start by adding your first course</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-    <style>
-        .layout-container {
-            display: flex;
-            margin-left: 250px; /* Adjust this width to match your sidebar's width */
-        }
-
-        .main-content {
-            padding: 20px;
-            flex-grow: 1;
-        }
-
-        @media (max-width: 768px) {
-            .layout-container {
-                margin-left: 0; /* Removes the margin for small screens */
+    
+    <script>
+        // Add mobile sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // You can add code here to toggle the sidebar on mobile
+            // This assumes you have a sidebar toggle button in your sidebar.html.twig
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
             }
-
-            .main-content {
-                padding: 15px;
-            }
-        }
-    </style>
+        });
+    </script>
 {% endblock %}

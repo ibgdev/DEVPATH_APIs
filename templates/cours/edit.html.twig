@@ -1,22 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <div class="layout-container">
-        {% include 'sidebar.html.twig' %}
-        
-        <div class="main-content">
-            <h1>Edit Course</h1>
-            {{ form(form) }}
-        </div>
-    </div>
-
-    <style>
+{% block stylesheets %}
+    {{ parent() }}
+        <style>
         .layout-container {
             display: flex;
-            margin-left: 250px; /* Adjust this width to match your sidebar's width */
         }
-
+        
         .main-content {
+            margin-left: 250px; /* Adjust this width to match your sidebar's width */
             padding: 20px;
             flex-grow: 1;
         }
@@ -31,4 +23,17 @@
             }
         }
     </style>
+{% endblock %}
+{% block body %}
+    <div class="layout-container">
+        {% include 'sidebar.html.twig' %}
+        
+        <div class="main-content">
+            <h1>Edit Course</h1>
+            {{ form_start(form, {'method': 'POST'}) }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+
 {% endblock %}

@@ -32,8 +32,8 @@
                             <td>{{ video.url }}</td>
                             <td>{{ video.ord }}</td>
                             <td>
-                                <a href="" class="btn btn-primary text-light">Edit</a>
-                                <form action="" method="post" style="display:inline;">
+                                <a href="{{ path("crud.video.edit", {id: course.id, idvideo: video.id}) }}" class="btn btn-primary text-light">Edit</a>
+                                <form action="{{ path("crud.video.delete", {id: course.id, idvideo: video.id}) }}" method="post" style="display:inline;">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ video.id) }}">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>
@@ -52,11 +52,11 @@
     <style>
         .layout-container {
             display: flex;
-            margin-left: 250px; /* Adjust this width based on your sidebar width */
         }
 
         .main-content {
             padding: 20px;
+            margin-left: 250px; /* Adjust this width to match your sidebar's width */
             flex-grow: 1;
         }
 

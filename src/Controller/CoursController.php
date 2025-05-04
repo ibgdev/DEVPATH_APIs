@@ -113,6 +113,61 @@ final class CoursController extends AbstractController
             'course' => $course,
         ]);
     }
+    #[Route('/course/{id}/video/edit/{idvideo}', name: 'crud.video.edit')]
+    public function video_edit(EntityManagerInterface $em, Request $request, Cours $course, int $idvideo): Response
+    {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        $video = $em->getRepository(Videos::class)->find($idvideo);
+    
+        if (!$video) {
+            throw $this->createNotFoundException('Video not found');
+        }
+    
+        $form = $this->createForm(VideoType::class, $video);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            $video->setCours($course);
+            
+            $em->persist($video);
+            $em->flush();
+            
+            $this->addFlash('success', 'Video updated successfully');
+            
+            return $this->redirectToRoute('crud.course.videos', ['id' => $course->getId()]);
+        }
+    
+        return $this->render('cours/video_add.html.twig', [
+            'form' => $form->createView(),
+            'course' => $course,
+        ]);
+    }
+
+    #[Route('/course/{id}/video/delete/{idvideo}', name: 'crud.video.delete')]
+public function video_delete(EntityManagerInterface $em, Cours $course, int $idvideo): Response
+{
+    if (!$this->isGranted('ROLE_ADMIN')) {
+        return $this->redirectToRoute('app_login');
+    }
+
+    $video = $em->getRepository(Videos::class)->find($idvideo);
+
+    if (!$video) {
+        throw $this->createNotFoundException('Video not found');
+    }
+
+    $em->remove($video);
+    $em->flush();
+
+    $this->addFlash('success', 'Video deleted successfully');
+
+    return $this->redirectToRoute('crud.course.videos', ['id' => $course->getId()]);
+}
+
+    
 
     // Api Pages
 
