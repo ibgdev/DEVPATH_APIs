@@ -13,7 +13,8 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        login:
+        # 🔐 API login for JWT
+        api_login:
             pattern: ^/api/login
             stateless: true
             json_login:
@@ -23,17 +24,21 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
+        # 🔐 API protected routes
         api:
             pattern: ^/api/
             stateless: true
             jwt: ~
             provider: app_user_provider
 
+        # 🧑‍💻 HTML login via Symfony form
         main:
             lazy: true
             provider: app_user_provider
-
-    access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/register, roles: PUBLIC_ACCESS }
-        # - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+            custom_authenticator: App\Security\LoginAuthenticator
+            logout:
+                path: app_logout
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /

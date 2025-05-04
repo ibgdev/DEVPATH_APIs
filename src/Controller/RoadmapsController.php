@@ -23,6 +23,9 @@ final class RoadmapsController extends AbstractController
     #[Route('/roadmaps', name: 'crud.roadmaps.all')]
     public function index(EntityManagerInterface $em): Response
     {   
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $roadmaps = $em->getRepository(Roadmaps::class)->findAll();
         return $this->render('roadmap/index.html.twig', [
             'roadmaps' => $roadmaps,
@@ -32,6 +35,9 @@ final class RoadmapsController extends AbstractController
     #[Route('/roadmap/add', name: 'crud.roadmaps.add')]
     public function add(EntityManagerInterface $em, Request $request): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $roadmap = new Roadmaps();
         $form = $this->createForm(RoadmapsType::class, $roadmap);   
         $form->handleRequest($request);
@@ -49,6 +55,9 @@ final class RoadmapsController extends AbstractController
     #[Route('/roadmap/edit/{id}', name: 'crud.roadmaps.edit')]
     public function edit(EntityManagerInterface $em, Request $request, Roadmaps $roadmap): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $form = $this->createForm(RoadmapsType::class, $roadmap);   
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -66,6 +75,9 @@ final class RoadmapsController extends AbstractController
     #[Route('/roadmap/delete/{id}', name: 'crud.roadmaps.delete')]
     public function delete(EntityManagerInterface $em, Roadmaps $roadmap)
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $em->remove($roadmap);
         $em->flush();
         $this->addFlash('success', 'roadmap deleted successfully');
@@ -75,6 +87,9 @@ final class RoadmapsController extends AbstractController
     #[Route('/roadmap/{id}/courses', name: 'crud.roadmap.courses')]
     public function courses(EntityManagerInterface $em, Roadmaps $roadmap): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $courses = $roadmap->getRoadmapCours();
         return $this->render('roadmap/courses.html.twig', [
             'courses' => $courses,
@@ -84,6 +99,9 @@ final class RoadmapsController extends AbstractController
     #[Route('/roadmap/{id}/courses/add', name: 'crud.roadmap.courses.add')]
     public function courses_add(EntityManagerInterface $em, Request $request, Roadmaps $roadmap): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $Rcourse = new RoadmapCours();
         $form = $this->createForm(RoadmapCourseType::class, $Rcourse);
         $form->handleRequest($request);

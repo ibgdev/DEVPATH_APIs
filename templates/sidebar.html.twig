@@ -1,94 +1,203 @@
 {% extends 'base.html.twig' %}
 
-    {% block stylesheets %}
-        <style>
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-bg: #1a2c56;
+            --sidebar-hover: #2d4482;
+            --sidebar-active: #3B82F6;
+            --sidebar-text: #ffffff;
+            --sidebar-icon: #a3bffa;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f8fafc;
         }
 
         .sidebar {
             width: 250px;
-            height: 100vh;
-            background-color: #1E3A8A; /* Dark blue */
+            background: linear-gradient(135deg, var(--sidebar-bg) 0%, #162447 100%);
             color: white;
-            padding: 20px;
+            padding: 0;
             position: fixed;
             top: 0;
             left: 0;
+            bottom: 0;
+            overflow-y: auto;
             transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar-header {
+            padding: 20px;
             text-align: center;
-            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .sidebar-header h2 {
-            font-size: 24px;
-            margin: 0;
+        .sidebar-header img {
+            max-width: 85%;
+            height: auto;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.2));
         }
 
         .sidebar-list {
             list-style: none;
-            padding: 0;
+            padding: 10px 0;
+            margin: 0;
         }
 
         .sidebar-list li {
-            margin: 20px 0;
+            margin: 5px 0;
+        }
+        
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: inherit;
         }
 
         .sidebar-list a {
-            color: white;
+            color: var(--sidebar-text);
             text-decoration: none;
-            font-size: 18px;
-            padding: 10px;
-            display: block;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            font-size: 16px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .sidebar-list a:hover {
-            background-color: #3B82F6; /* Lighter blue for hover effect */
+            background-color: var(--sidebar-hover);
+            transform: translateX(5px);
+        }
+
+        .sidebar-list a.active {
+            background-color: var(--sidebar-active);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .sidebar-list a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 0;
+            width: 3px;
+            background-color: #ffffff;
+            border-radius: 0 3px 3px 0;
+            transition: height 0.3s ease;
+        }
+
+        .sidebar-list a:hover::before {
+            height: 20px;
+        }
+
+        .sidebar-list a.active::before {
+            height: 25px;
+        }
+
+        .sidebar-icon {
+            margin-right: 12px;
+            font-size: 18px;
+            color: var(--sidebar-icon);
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-list a:hover .sidebar-icon,
+        .sidebar-list a.active .sidebar-icon {
+            color: var(--sidebar-text);
         }
 
         .content {
+            margin-left: 250px;
             padding: 20px;
             flex-grow: 1;
+            transition: all 0.3s ease;
         }
 
-        /* Responsive design for smaller screens */
         @media (max-width: 768px) {
             .sidebar {
                 width: 200px;
-                padding: 15px;
             }
-
-            .sidebar-header h2 {
-                font-size: 20px;
-            }
-
-            .sidebar-list a {
-                font-size: 16px;
-            }
-
+            
             .content {
-                margin-left: 0;
-                padding: 15px;
+                margin-left: 200px;
+            }
+            
+            .sidebar-list a {
+                padding: 10px 15px;
+                font-size: 15px;
             }
         }
-        </style>
-    {% endblock %}
+    </style>
+{% endblock %}
+
 {% block body %}
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2>My Sidebar</h2>
+            <img src="{{ asset('images/DEVPATH.png') }}" alt="devpath logo">
         </div>
         <ul class="sidebar-list">
-            <li><a href="{{ path('crud.course.all') }}">Courses</a></li>
-            <li><a href="{{ path('crud.roadmaps.all') }}">Roadmaps</a></li>
+            <li>
+                <a href="{{ path('crud.course.all') }}" class="{{ app.request.get('_route') == 'crud.course.all' ? 'active' : '' }}">
+                    <i class="fas fa-graduation-cap sidebar-icon"></i>
+                    Courses
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('crud.roadmaps.all') }}" class="{{ app.request.get('_route') == 'crud.roadmaps.all' ? 'active' : '' }}">
+                    <i class="fas fa-map sidebar-icon"></i>
+                    Roadmaps
+                </a>
+            </li>
         </ul>
+        
+        <div class="sidebar-footer">
+            <ul class="sidebar-list">
+                <li>
+                    <a href="{{ path('app_logout') }}"
+                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt sidebar-icon"></i>
+                        Logout
+                    </a>
+                    <form id="logout-form" action="{{ path('app_logout') }}" method="POST" style="display: none;"></form>
+                </li>
+            </ul>
+        </div>
     </div>
 
+    <div class="content">
+        {# Your main page content goes here #}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set active menu item based on current URL
+            const currentLocation = window.location.pathname;
+            const menuItems = document.querySelectorAll('.sidebar-list a');
+            
+            menuItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href !== '#' && currentLocation.includes(href) && !item.classList.contains('active')) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
 {% endblock %}

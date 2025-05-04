@@ -19,6 +19,9 @@ final class CoursController extends AbstractController
     #[Route('/courses', name: 'crud.course.all')]
     public function index(EntityManagerInterface $em): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $courses = $em->getRepository(Cours::class)->findAll();
         return $this->render('cours/index.html.twig', [
             'courses' => $courses,
@@ -28,6 +31,9 @@ final class CoursController extends AbstractController
     #[Route('/course/add', name: 'crud.course.add')]
     public function add(Request $request, EntityManagerInterface $em)
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $course = new Cours();
         $form = $this->createForm(CoursType::class, $course);
         $form->handleRequest($request);
@@ -45,6 +51,9 @@ final class CoursController extends AbstractController
     #[Route('/course/edit/{id}', name: 'crud.course.edit')]
     public function edit(Request $request, EntityManagerInterface $em, Cours $course)
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $form = $this->createForm(CoursType::class, $course);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -61,6 +70,9 @@ final class CoursController extends AbstractController
     #[Route('/course/delete/{id}', name: 'crud.course.delete')]
     public function delete(EntityManagerInterface $em, Cours $course)
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $em->remove($course);
         $em->flush();
         $this->addFlash('success', 'Course deleted successfully');
@@ -71,6 +83,9 @@ final class CoursController extends AbstractController
     #[Route('/course/{id}/videos', name: 'crud.course.videos')]
     public function videos(EntityManagerInterface $em, Cours $course): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $videos = $course->getVideos();
         return $this->render('cours/videos.html.twig', [
             'course' => $course,
@@ -80,6 +95,9 @@ final class CoursController extends AbstractController
     #[Route('/course/{id}/video/add', name: 'crud.video.add')]
     public function video_add(EntityManagerInterface $em, Request $request, Cours $course): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
         $video = new Videos();
         $form = $this->createForm(VideoType::class, $video);
         $form->handleRequest($request);
