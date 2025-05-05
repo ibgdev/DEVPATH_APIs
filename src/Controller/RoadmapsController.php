@@ -110,6 +110,7 @@ final class RoadmapsController extends AbstractController
             $em->persist($Rcourse);
             $em->flush();
             $this->addFlash('success', 'Course added successfully');
+            return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
         }
         return $this->render('roadmap/course_add.html.twig', [
             'form' => $form,
