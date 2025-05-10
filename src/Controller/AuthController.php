@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use phpDocumentor\Reflection\DocBlock\Tags\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -109,6 +111,49 @@ final class AuthController extends AbstractController
         // Return the user data as JSON
         return new JsonResponse($user_data, 200);
     }
+    
+#[Route('/api/change-infos', name: "api.change.userInfos", methods: ["POST"])]
+public function api_change_infos(
+    Request $request,
+    EntityManagerInterface $em,
+    UserPasswordHasherInterface $passwordHasher
+): JsonResponse {
+    $data = json_decode($request->getContent(), true);
+
+    $id = $data['id'] ?? null;
+    $username = $data['username'] ?? null;
+    $email = $data['email'] ?? null;
+    $password = $data['password'] ?? null;
+
+    if (!$id || !$username || !$email) {
+        return new JsonResponse(['error' => 'Missing required fields.'], 400);
+    }
+
+    $user = $em->getRepository(User::class)->find($id);
+
+    if (!$user) {
+        return new JsonResponse(['error' => 'User not found.'], 404);
+    }
+
+    // Check if email is already used by another user
+    $existingUser = $em->getRepository(User::class)->findOneBy(['email' => $email]);
+    if ($existingUser && $existingUser->getId() !== $user->getId()) {
+        return new JsonResponse(['error' => 'Email is already in use.'], 409);
+    }
+
+    $user->setUsername($username)
+        ->setEmail($email);
+
+    if (!empty($password)) {
+        $hashedPassword = $passwordHasher->hashPassword($user, $password);
+        $user->setPassword($hashedPassword);
+    }
+
+    $em->persist($user);
+    $em->flush();
+
+    return new JsonResponse(['message' => 'User info updated successfully.'], 200);
+}
 
 
 }
