@@ -33,7 +33,7 @@
                             <td>{{ course.ord }}</td>
                             <td>
                                 <a href="{{ path('crud.course.edit', {id: course.cours.id}) }}" class="btn btn-primary text-light">Edit</a>
-                                <form action="{{ path('crud.course.delete', {id: course.cours.id}) }}" method="post" style="display:inline;">
+                                <form action="{{ path('crud.roadmap.courses.delete', {id: course.roadmap.id, idCours: course.cours.id}) }}" method="post" style="display:inline;">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ course.id) }}">
                                     <button type="submit" class="btn btn-danger">Delete</button>
                                 </form>

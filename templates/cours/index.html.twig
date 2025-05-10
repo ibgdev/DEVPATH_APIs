@@ -89,6 +89,12 @@
             border-left: 4px solid var(--success-btn);
             color: #065f46;
         }
+        .alert-error {
+            background-color: rgba(239, 35, 60, 0.1); /* Light red background */
+            border-left: 4px solid var(--danger-btn); /* Red border */
+            color: #900909; /* Dark red text */
+        }
+
 
         .action-bar {
             display: flex;
@@ -236,6 +242,12 @@
                     <i class="fas fa-check-circle"></i> {{ msg }}
                 </div>
             {% endfor %}
+            {% for msg in app.flashes('error') %}
+                <div class="alert alert-success bg-danger border-danger text-white">
+                    <i class="fas fa-times-circle"></i> {{ msg }}
+                </div>
+            {% endfor %}
+
             
             <div class="content-card">
                 <div class="action-bar">

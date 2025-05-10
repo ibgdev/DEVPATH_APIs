@@ -117,6 +117,38 @@ final class RoadmapsController extends AbstractController
             'rcourse' => $Rcourse,
         ]);
     }
+#[Route('/roadmap/{id}/courses/delete/{idCours}', name: 'crud.roadmap.courses.delete')]
+public function courses_delete(EntityManagerInterface $em, Request $request, Roadmaps $roadmap, int $idCours): Response
+{
+    if (!$this->isGranted('ROLE_ADMIN')) {
+        return $this->redirectToRoute('app_login');
+    }
+
+    $cours = $em->getRepository(Cours::class)->find($idCours);
+
+    if (!$cours) {
+        $this->addFlash('error', 'Course not found.');
+        return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
+    }
+
+    $roadmapCours = $em->getRepository(RoadmapCours::class)->findOneBy([
+        'roadmap' => $roadmap,
+        'cours' => $cours
+    ]);
+
+    if (!$roadmapCours) {
+        $this->addFlash('error', 'This course is not part of the roadmap.');
+        return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
+    }
+
+    $em->remove($roadmapCours);
+    $em->flush();
+
+    $this->addFlash('success', 'Course removed from roadmap successfully.');
+
+    return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
+}
+
 
     //api pages
     #[Route('/api/roadmaps', name: 'api.roadmaps.all')]

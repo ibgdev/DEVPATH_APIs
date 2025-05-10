@@ -73,6 +73,30 @@ final class CoursController extends AbstractController
         if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_login');
         }
+
+        if (count($course->getVideos()) > 0) {
+            $this->addFlash("error", "Course can't be deleted delete its videos first");
+            return $this->redirectToRoute('crud.course.all');
+        }
+
+        if (count($course->getRoadmapCours()) > 0) {
+
+            foreach ($course->getRoadmapCours() as $road) {
+                $em->remove($road);
+            }
+
+            $em->flush();
+        }
+
+        if (count($course->getProgressions()) > 0) {
+            foreach ($course->getProgressions() as $prog) {
+                $em->remove($prog);
+            }
+            $em->flush();
+        }
+
+
+
         $em->remove($course);
         $em->flush();
         $this->addFlash('success', 'Course deleted successfully');
@@ -119,27 +143,27 @@ final class CoursController extends AbstractController
         if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_login');
         }
-        
+
         $video = $em->getRepository(Videos::class)->find($idvideo);
-    
+
         if (!$video) {
             throw $this->createNotFoundException('Video not found');
         }
-    
+
         $form = $this->createForm(VideoType::class, $video);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             $video->setCours($course);
-            
+
             $em->persist($video);
             $em->flush();
-            
+
             $this->addFlash('success', 'Video updated successfully');
-            
+
             return $this->redirectToRoute('crud.course.videos', ['id' => $course->getId()]);
         }
-    
+
         return $this->render('cours/video_add.html.twig', [
             'form' => $form->createView(),
             'course' => $course,
@@ -147,27 +171,27 @@ final class CoursController extends AbstractController
     }
 
     #[Route('/course/{id}/video/delete/{idvideo}', name: 'crud.video.delete')]
-public function video_delete(EntityManagerInterface $em, Cours $course, int $idvideo): Response
-{
-    if (!$this->isGranted('ROLE_ADMIN')) {
-        return $this->redirectToRoute('app_login');
+    public function video_delete(EntityManagerInterface $em, Cours $course, int $idvideo): Response
+    {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $video = $em->getRepository(Videos::class)->find($idvideo);
+
+        if (!$video) {
+            throw $this->createNotFoundException('Video not found');
+        }
+
+        $em->remove($video);
+        $em->flush();
+
+        $this->addFlash('success', 'Video deleted successfully');
+
+        return $this->redirectToRoute('crud.course.videos', ['id' => $course->getId()]);
     }
 
-    $video = $em->getRepository(Videos::class)->find($idvideo);
 
-    if (!$video) {
-        throw $this->createNotFoundException('Video not found');
-    }
-
-    $em->remove($video);
-    $em->flush();
-
-    $this->addFlash('success', 'Video deleted successfully');
-
-    return $this->redirectToRoute('crud.course.videos', ['id' => $course->getId()]);
-}
-
-    
 
     // Api Pages
 
@@ -189,7 +213,7 @@ public function video_delete(EntityManagerInterface $em, Cours $course, int $idv
         }, $courses);
         return $this->json($data);
     }
-    
+
     #[Route('/api/courses', name: 'api.courses')]
     public function api_get_courses(EntityManagerInterface $em): Response
     {
@@ -233,7 +257,7 @@ public function video_delete(EntityManagerInterface $em, Cours $course, int $idv
             return $this->json(['message' => 'Course not found'], 404);
         }
 
-        $videos = $course->getVideos(); 
+        $videos = $course->getVideos();
 
         $data = [];
 
