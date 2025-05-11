@@ -155,6 +155,12 @@
                     Roadmaps
                 </a>
             </li>
+            <li>
+                <a href="{{ path('app_user_index') }}" class="{{ app.request.get('_route') == 'app_user_index' ? 'active' : '' }}">
+                    <i class="fas fa-users sidebar-icon"></i>
+                    Users
+                </a>
+            </li>
         </ul>
         
         <div class="sidebar-footer">

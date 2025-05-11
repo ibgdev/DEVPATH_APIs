@@ -1,0 +1,44 @@
+
+<div class="form-container">
+    {{ form_start(form, {'attr': {'class': 'styled-form'}}) }}
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.username, 'Username', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.username, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.username) }}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.roles, 'Roles', {'label_attr': {'class': 'form-label'}}) }}
+                <div class="checkbox-group">
+                    {% for choice in form.roles %}
+                        <div class="checkbox-item">
+                            {{ form_widget(choice) }}
+                            {{ form_label(choice) }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {{ form_errors(form.roles) }}
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary">
+                <i class="fas fa-save btn-icon"></i> {{ button_label|default('Save') }}
+            </button>
+            <a href="{{ path('app_user_index') }}" class="btn btn-outline">
+                <i class="fas fa-times btn-icon"></i> Cancel
+            </a>
+        </div>
+    {{ form_end(form) }}
+</div>
