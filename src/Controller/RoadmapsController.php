@@ -22,7 +22,7 @@ final class RoadmapsController extends AbstractController
 
     #[Route('/roadmaps', name: 'crud.roadmaps.all')]
     public function index(EntityManagerInterface $em): Response
-    {   
+    {
         if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_login');
         }
@@ -39,7 +39,7 @@ final class RoadmapsController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
         $roadmap = new Roadmaps();
-        $form = $this->createForm(RoadmapsType::class, $roadmap);   
+        $form = $this->createForm(RoadmapsType::class, $roadmap);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($roadmap);
@@ -58,7 +58,7 @@ final class RoadmapsController extends AbstractController
         if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_login');
         }
-        $form = $this->createForm(RoadmapsType::class, $roadmap);   
+        $form = $this->createForm(RoadmapsType::class, $roadmap);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($roadmap);
@@ -117,43 +117,43 @@ final class RoadmapsController extends AbstractController
             'rcourse' => $Rcourse,
         ]);
     }
-#[Route('/roadmap/{id}/courses/delete/{idCours}', name: 'crud.roadmap.courses.delete')]
-public function courses_delete(EntityManagerInterface $em, Request $request, Roadmaps $roadmap, int $idCours): Response
-{
-    if (!$this->isGranted('ROLE_ADMIN')) {
-        return $this->redirectToRoute('app_login');
-    }
+    #[Route('/roadmap/{id}/courses/delete/{idCours}', name: 'crud.roadmap.courses.delete')]
+    public function courses_delete(EntityManagerInterface $em, Request $request, Roadmaps $roadmap, int $idCours): Response
+    {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_login');
+        }
 
-    $cours = $em->getRepository(Cours::class)->find($idCours);
+        $cours = $em->getRepository(Cours::class)->find($idCours);
 
-    if (!$cours) {
-        $this->addFlash('error', 'Course not found.');
+        if (!$cours) {
+            $this->addFlash('error', 'Course not found.');
+            return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
+        }
+
+        $roadmapCours = $em->getRepository(RoadmapCours::class)->findOneBy([
+            'roadmap' => $roadmap,
+            'cours' => $cours
+        ]);
+
+        if (!$roadmapCours) {
+            $this->addFlash('error', 'This course is not part of the roadmap.');
+            return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
+        }
+
+        $em->remove($roadmapCours);
+        $em->flush();
+
+        $this->addFlash('success', 'Course removed from roadmap successfully.');
+
         return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
     }
-
-    $roadmapCours = $em->getRepository(RoadmapCours::class)->findOneBy([
-        'roadmap' => $roadmap,
-        'cours' => $cours
-    ]);
-
-    if (!$roadmapCours) {
-        $this->addFlash('error', 'This course is not part of the roadmap.');
-        return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
-    }
-
-    $em->remove($roadmapCours);
-    $em->flush();
-
-    $this->addFlash('success', 'Course removed from roadmap successfully.');
-
-    return $this->redirectToRoute('crud.roadmap.courses', ['id' => $roadmap->getId()]);
-}
 
 
     //api pages
     #[Route('/api/roadmaps', name: 'api.roadmaps.all')]
     public function api_get_roadmaps(EntityManagerInterface $em): Response
-    {   
+    {
         $roadmaps = $em->getRepository(Roadmaps::class)->findAll();
         if (empty($roadmaps)) {
             return $this->json(['message' => 'No courses found']);
@@ -162,7 +162,7 @@ public function courses_delete(EntityManagerInterface $em, Request $request, Roa
             return [
                 'id' => $roadmap->getId(),
                 'titre' => $roadmap->getTitre(),
-                'description' => $roadmap->getDescription(),            
+                'description' => $roadmap->getDescription(),
             ];
         }, $roadmaps);
         return $this->json($data);
@@ -172,14 +172,14 @@ public function courses_delete(EntityManagerInterface $em, Request $request, Roa
     public function api_courses(EntityManagerInterface $em, Roadmaps $roadmap): JsonResponse
     {
         $courses = $roadmap->getRoadmapCours(); // Assuming this returns a collection of RoadmapCourse
-    
+
         if (empty($courses)) {
             return $this->json(['message' => 'No courses found']);
         }
-    
+
         $data = array_map(function ($roadmapCourse) {
             $course = $roadmapCourse->getCours(); // Accessing the associated Course entity
-    
+
             return [
                 'id' => $course->getId(), // Ensure this is the correct course ID
                 'titre' => $course->getTitre(),
@@ -187,32 +187,39 @@ public function courses_delete(EntityManagerInterface $em, Request $request, Roa
                 'image' => $course->getImageUrl(),
             ];
         }, $courses->toArray());
-    
+
         return $this->json($data);
     }
     #[Route('/api/roadmaps/{id}/courses', name: 'api.roadmap.courses')]
     public function api_course(EntityManagerInterface $em, Roadmaps $roadmap): JsonResponse
     {
-        $courses = $roadmap->getRoadmapCours(); // Assuming this returns a collection of RoadmapCourse
-    
-        if (empty($courses)) {
+        // Récupérer les RoadmapCours liés à cette roadmap, triés par "ord" ascendant
+        $Rcourses = $em->getRepository(RoadmapCours::class)->findBy(
+            ['roadmap' => $roadmap],
+            ['ord' => 'ASC']
+        );
+
+        if (empty($Rcourses)) {
             return $this->json(['message' => 'No courses found']);
         }
-    
-        $data = array_map(function ($roadmapCourse) {
-            $course = $roadmapCourse->getCours(); // Accessing the associated Course entity
-    
+
+        $data = array_map(function (RoadmapCours $roadmapCourse) {
+            $course = $roadmapCourse->getCours();
+
             return [
-                'id' => $course->getId(), // Ensure this is the correct course ID
+                'id' => $course->getId(),
                 'titre' => $course->getTitre(),
                 'description' => $course->getDescription(),
                 'image' => $course->getImageUrl(),
+                'ord' => $roadmapCourse->getOrd()
             ];
-        }, $courses->toArray());
-    
+        }, $Rcourses);
+
         return $this->json($data);
     }
-        
+
+
+
     #[Route('/api/roadmaps/{id}', name: 'api.roadmap.infos')]
     public function api_infos(EntityManagerInterface $em, Roadmaps $roadmap): JsonResponse
     {
