@@ -118,7 +118,7 @@
         
         .form-icon {
             position: absolute;
-            top: 42px;
+            top: 50px;
             left: 15px;
             color: #adb5bd;
             transition: all 0.3s ease;
@@ -145,6 +145,8 @@
         .form-check-label {
             cursor: pointer;
             user-select: none;
+            margin: 0;
+            padding-top: 15px;
         }
         
         .btn-login {
@@ -218,13 +220,13 @@
                 <div class="form-group">
                     <label for="inputEmail">Email</label>
                     <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
-                           class="form-control" autocomplete="email" required autofocus>
+                           class="form-control" autocomplete="email" placeholder="Your Email" required autofocus>
                     <i class="fas fa-envelope form-icon"></i>
                 </div>
                 
                 <div class="form-group">
                     <label for="inputPassword">Password</label>
-                    <input type="password" name="password" id="inputPassword" 
+                    <input type="password" name="password" placeholder="************" id="inputPassword" 
                            class="form-control" autocomplete="current-password" required>
                     <i class="fas fa-lock form-icon"></i>
                 </div>
