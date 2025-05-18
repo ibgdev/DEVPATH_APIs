@@ -80,6 +80,7 @@
 	}
 
 	.alert {
+		z-index: 999;
 		border-radius: 0.375rem;
 		padding: 1rem;
 		margin-bottom: 1rem;
@@ -91,11 +92,7 @@
 		color: #065f46;
 	}
 
-	.alert-error {
-		background-color: rgba(239, 35, 60, 0.1);
-		border-left: 4px solid var(--danger-btn);
-		color: #900909;
-	}
+
 
 	.action-bar {
 		display: flex;
@@ -267,7 +264,7 @@
 			</div>
 		{% endfor %}
 		{% for msg in app.flashes('error') %}
-			<div class="alert alert-error">
+			<div class="alert alert-danger">
 				<i class="fas fa-times-circle"></i>
 				{{ msg }}
 			</div>
